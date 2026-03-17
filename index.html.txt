@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WBS Sync - Dashboard</title>
+
+<style>
+:root {
+  --primary: #2563eb;
+  --bg: #f1f5f9;
+  --card: #ffffff;
+  --text: #1e293b;
+  --muted: #64748b;
+  --radius: 18px;
+}
+
+* { box-sizing: border-box; font-family: system-ui; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+}
+
+.header {
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  color: white;
+  padding: 40px 20px;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+  text-align: center;
+}
+
+.header h1 { margin: 0; }
+
+.container {
+  max-width: 500px;
+  margin: -20px auto 20px;
+  padding: 0 15px;
+}
+
+/* Card */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.card h2 {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+  color: var(--text);
+}
+
+/* Tabellen */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  text-align: left;
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  padding: 10px 5px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+tbody td {
+  padding: 10px 5px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 14px;
+  color: var(--text);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* KI Upload */
+.upload {
+  text-align: center;
+  padding: 25px;
+  border: 2px dashed #cbd5e1;
+  border-radius: var(--radius);
+  cursor: pointer;
+  background: #fcfcfd;
+}
+
+.upload:hover {
+  border-color: var(--primary);
+}
+
+button {
+  padding: 10px 15px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  margin-top: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.status {
+  margin-top: 10px;
+  color: green;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h1>📱 WBS Sync</h1>
+  <p>KI Schul-App</p>
+</div>
+
+<div class="container">
+
+  <!-- Klausurplan -->
+  <div class="card">
+    <h2>📅 Klausurplan</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Datum</th>
+          <th>Fach</th>
+          <th>Zeit</th>
+          <th>Raum</th>
+        </tr>
+      </thead>
+      <tbody id="klausur-table"></tbody>
+    </table>
+  </div>
+
+  <!-- Bus & Bahn -->
+  <div class="card">
+    <h2>🚌 Bus & Bahn</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Linie</th>
+          <th>Richtung</th>
+          <th>Abfahrt</th>
+        </tr>
+      </thead>
+      <tbody id="transport-table"></tbody>
+    </table>
+  </div>
+
+  <!-- News -->
+  <div class="card">
+    <h2>📰 Aktuelle News</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Datum</th>
+          <th>Titel</th>
+          <th>Text</th>
+        </tr>
+      </thead>
+      <tbody id="news-table"></tbody>
+    </table>
+  </div>
+
+  <!-- KI Upload -->
+  <div class="card">
+    <h2>🤖 KI Dokumenten-Analyse</h2>
+    <div class="upload">
+      <p>PDF hochladen & automatisch auswerten</p>
+      <button onclick="simulateAI()">Mit KI analysieren</button>
+      <div class="status" id="status"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Beispiel-Daten (Simulation)
+const data = {
+  klausuren: [
+    { datum: "15.04.2026", fach: "Mathematik", zeit: "08:00 - 10:30", raum: "Aula" },
+    { datum: "17.04.2026", fach: "Deutsch", zeit: "09:00 - 11:15", raum: "204" },
+    { datum: "20.04.2026", fach: "Englisch", zeit: "10:00 - 12:30", raum: "Aula" }
+  ],
+  transport: [
+    { linie: "SB91", richtung: "Stadtbus", abfahrt: "in 4 Min" },
+    { linie: "RE19", richtung: "Düsseldorf Hbf", abfahrt: "in 12 Min" }
+  ],
+  news: [
+    { datum: "12.03.", titel: "Sportfest", text: "Anmeldung ab sofort im Sekretariat." }
+  ]
+};
+
+// Render-Funktionen
+function render() {
+  document.getElementById('klausur-table').innerHTML =
+    data.klausuren.map(k => `
+      <tr>
+        <td>${k.datum}</td>
+        <td>${k.fach}</td>
+        <td>${k.zeit}</td>
+        <td>${k.raum}</td>
+      </tr>
+    `).join("");
+
+  document.getElementById('transport-table').innerHTML =
+    data.transport.map(t => `
+      <tr>
+        <td>${t.linie}</td>
+        <td>${t.richtung}</td>
+        <td>${t.abfahrt}</td>
+      </tr>
+    `).join("");
+
+  document.getElementById('news-table').innerHTML =
+    data.news.map(n => `
+      <tr>
+        <td>${n.datum}</td>
+        <td>${n.titel}</td>
+        <td>${n.text}</td>
+      </tr>
+    `).join("");
+}
+
+// Simulierte KI-Analyse
+function simulateAI() {
+  document.getElementById("status").innerText = "KI analysiert Dokument...";
+  setTimeout(() => {
+    document.getElementById("status").innerText = "✅ Daten erfolgreich erkannt!";
+    render();
+  }, 1500);
+}
+</script>
+
+</body>
+</html>
